@@ -25,7 +25,7 @@ for line in lines:
         if i == 2:
             measurement -= 0.2
         measurements.append(measurement)
-
+#for creating augmented training data
 augmented_images, augmented_measurements = [], []
 for image, measurement in zip(images, measurements):
     augmented_images.append(image)
@@ -35,25 +35,19 @@ for image, measurement in zip(images, measurements):
 
 X_train = np.array(augmented_images)
 y_train = np.array(augmented_measurements)
-
+print(len(augmented_images))
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import MaxPooling2D
+from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout, Conv2D
 
+#NVIDIA model, using Keras 2.0 API
 model = Sequential()
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((60,25), (0,0))))
-model.add(Convolution2D(24,5,5,subsample=(2,2), activation='relu'))
-#model.add(Dropout(0.3))
-model.add(Convolution2D(36,5,5,subsample=(2,2), activation='relu'))
-#model.add(Dropout(0.3))
-model.add(Convolution2D(48,5,5,subsample=(2,2), activation='relu'))
-#model.add(Dropout(0.3))
-model.add(Convolution2D(64,3,3,activation='relu'))
-#model.add(Dropout(0.3))
-model.add(Convolution2D(64,3,3,activation='relu'))
-#model.add(Dropout(0.3))
+model.add(Conv2D(24,(5,5),strides=(2,2), activation='relu'))
+model.add(Conv2D(36,(5,5),strides=(2,2), activation='relu'))
+model.add(Conv2D(48,(5,5),strides=(2,2), activation='relu'))
+model.add(Conv2D(64,(3,3),activation='relu'))
+model.add(Conv2D(64,(3,3),activation='relu'))
 model.add(Flatten())
 model.add(Dropout(0.5))
 model.add(Dense(50))
